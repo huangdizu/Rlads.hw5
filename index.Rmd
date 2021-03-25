@@ -1,0 +1,277 @@
+---
+author: "未命名 B01201001 一般系"
+title: "HW 5: Data Transformation with dplyr"
+date: |
+  | 2021-03-25
+  |
+  | [Rmd Source (for TAs)](./index.Rmd){download='`r basename(getwd())`.Rmd'}
+output:
+  html_document:
+    number_sections: yes
+    highlight: tango
+    toc: yes
+    toc_float:
+      collapsed: no
+    css: style.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,comment = '#>',error=TRUE, results = 'hold', out.width='65%', fig.align = 'center')
+```
+
+基本題 (共 100 分)
+=====================
+
+## 資料讀取 (15 分)
+
+請將作業資料夾內的 `titanic.csv` 以 `tibble`(建議) 或 `data.frame` 的形式讀入並儲存於變項 `titanic` 。需注意 `titanic.csv` 是以**分號**作為分隔符號的 `csv` 檔，因此使用 `readr::read_csv()` (使用**逗號**作為分隔符號) 會無法正常讀取檔案。
+
+hint: 可以參考 `readr::read_delim()` 或是在 RStudio `import Dataset` 的界面中選擇適當的 "Delimiter" (分隔符號)。
+
+```{r import-data, message=FALSE}
+# write your code here
+
+
+# Do Not modify the code below
+head(titanic)
+# should print out:
+#> # A tibble: 6 x 12
+#>   PassengerId Survived Pclass Name  Sex     Age SibSp Parch Ticket  Fare Cabin
+#>         <dbl> <chr>     <dbl> <chr> <chr> <dbl> <dbl> <dbl> <chr>  <dbl> <chr>
+#> 1         343 No            2 Coll… male     28     0     0 248740 13    <NA> 
+#> 2          76 No            3 Moen… male     25     0     0 348123  7.65 F G73
+#> 3         641 No            3 Jens… male     20     0     0 350050  7.85 <NA> 
+#> 4         568 No            3 Pals… fema…    29     0     4 349909 21.1  <NA> 
+#> 5         672 No            1 Davi… male     31     1     0 F.C. … 52    B71  
+#> 6         105 No            3 Gust… male     37     2     0 31012…  7.92 <NA> 
+#> # … with 1 more variable: Embarked <chr>
+```
+
+
+## 分組摘要 (30 分)
+
+`titanic` 是著名的鐵達尼號沉船事件中[搭上鐵達尼號的乘客名單](https://zh.wikipedia.org/wiki/鐵達尼號乘客列表)，這筆資料還包含了這些乘客的其它資訊：
+
+1. `Pclass`：該乘客所購買的船票等級。船票等級共分 3 級，`1` 是最高的等級 (最貴)，`3` 是最低的等級
+2. `Survived`：該乘客是否在沉船事件後存活下來
+3. `Sex`：該乘客的性別 
+
+請使用 R 整理資料的功能，去：
+
+1. 將乘客依據**性別 (`Sex`)** 以及**船票等級 (`Pclass`)** 進行分組
+2. 再計算出各組乘客的**生存率**
+
+```{r summarise1, message=FALSE}
+# Write your code here
+library(dplyr)
+
+
+# Should print out:
+#> # A tibble: 6 x 3
+#> # Groups:   Sex [2]
+#>   Sex    Pclass percent_survived
+#>   <chr>   <dbl>            <dbl>
+#> 1 female      1            0.968
+#> 2 female      2            0.921
+#> 3 female      3            0.5  
+#> 4 male        1            0.369
+#> 5 male        2            0.157
+#> 6 male        3            0.135
+```
+
+
+## 幾歲有差嗎？ (共 55 分)
+
+接下來要探討的是乘客生存與否與**年齡層**是否有關聯。想要探討這點的一個方法，是先將乘客**分成不同的年齡層**再去看看不同年齡層的生存率。你的任務是：
+
+1. 為 `titanic` 創立一個新的變項 `age_group`，它必須有 3 個類別 `young`, `middle` 與 `old`:
+    - `young`：該乘客的年齡小於 18 歲
+    - `middle`：該乘客的年齡介於 18 (含) 至 60 (不含) 歲之間
+    - `old`：該乘客的年齡超過 60 (含) 歲
+2. 將乘客依據 `Pclass` 以及 `age_group` 分組
+3. 計算各組乘客的**生存率**以及各組的**人數**
+
+
+### Writing a Vectorized function (30 分)
+
+在使用 `dplyr` 整理資料時，時常會需要撰寫自己的函數。而要讓撰寫的函數能融入 `dplyr` 的使用 (尤其是與 `mutate()` 併用)，需要撰寫 vectorized function。下方(未完成)的程式碼即是在撰寫一個 vectorized function，`age_group()`。這個函數的目的在於幫助你**將不同的年齡分組**。  
+例如，若輸入 `age_group(10)` 它會回傳 `[1] "young"`；  
+若輸入 `age_group(c(NA, 18, 60))` 它回傳 `[1] NA "middle" "old"`。
+
+Hint:
+
+- 此題需使用 `sapply()`，請勿使用 **for loop**
+- `sapply(<vector>, <function>)` 是一個比較抽象的函數。它的功能是用來將第一個 argument 裡 `<vector>` 的**每個元素**一一傳入 `<function>` 運算。最後會傳回一個與 `<vector>` 等長的 vector (詳閱說明文件)。例如，下方的程式碼即在將一個 numeric vector `vec` 改以英文字串去表示：
+  
+```{r}
+vec <- c(2, 1, 3, 2)
+atom_func <- function(x) {
+  if (x == 1) return("One")
+  if (x == 2) return("Two")
+  if (x == 3) return("Three")
+}
+
+vec
+sapply(vec, atom_func)
+```
+
+你的任務是擴增下方的程式碼，使 `age_group()` 能正常運作：
+
+```{r vectorized-func}
+age_group <- function(ages) {
+  ages <- sapply(ages, function(x) {
+    # Modify the code below
+    if (is.na(x)) return(NA)
+    return('old')
+  })
+  
+  return(ages)
+}
+
+# Do not modify the code below
+age_group(NA)
+age_group(c(17, 18, 19, NA, 59, 60))
+# should print out:
+#> [1] NA
+#> [1] "young"  "middle" "middle" NA       "middle" "old"
+```
+
+
+### 摘要表 (25 分)
+
+請使用前面完成的函數 `age_group()` 以及 `dplyr` 的 `mutate()`, `filter()`, `group_by()`, `summarise()` 等函數去整理出一份摘要表。這份摘要表要有依據 `Pclass` 以及 `age_group` 所分成的 9 組中，各組的人數 (`count`) 以及存活率 (`percent_survived`)。
+
+```{r summarise2, message=FALSE}
+# Write your code here
+
+# Should print out:
+#> # A tibble: 9 x 4
+#> # Groups:   Pclass [3]
+#>   Pclass age_group percent_survived count
+#>    <dbl> <chr>                <dbl> <int>
+#> 1      1 middle               0.675   157
+#> 2      1 old                  0.294    17
+#> 3      1 young                0.917    12
+#> 4      2 middle               0.418   146
+#> 5      2 old                  0.25      4
+#> 6      2 young                0.913    23
+#> 7      3 middle               0.202   272
+#> 8      3 old                  0.2       5
+#> 9      3 young                0.372    78
+```
+
+
+
+進階選答題 (共 20 分)
+=====================
+
+我又來了！請將資料夾中的`week3Rclass.csv`讀進來並取名為`Q_Q`：
+
+>以下題目請使用`dplyr`套件中的函數完成。
+
+1. 請修改變項`gender`中的資料，將**2**改成**male**，**1**改成**female**，**0**改成**other**。並將結果取名為`O_O`。(5分)
+
+```{r message=FALSE}
+# Write your code here
+
+# Do not modify the code below
+O_O[c(21:25, 46:50),]
+
+# Should print out:
+# A tibble: 10 x 6
+#    nickname  gender grade q_self q_teacher   GPA
+#    <chr>     <chr>  <dbl>  <dbl>     <dbl> <dbl>
+#  1 na        male       1    100       100  3.7 
+#  2 OhYah     male       3     60       100  4.23
+#  3 TAT       female     4     75        70  3   
+#  4 QQQ       other      1    100       100  3.3 
+#  5 Mictu     male       4     70       100  4.3 
+#  6 trumpy    other      4     87        99  4   
+#  7 bolee     male       1     70        90  3.13
+#  8 mm        female     1     70        60  3.33
+#  9 shawn     female     1     80       100  3.8 
+# 10 KaiSquare male       3     90        90  3.5 
+```
+
+2. 請根據第一題的結果，計算出各年級中，不同性別的人數，以及人數在各年級中所佔比例，並將結果取名為`A_A`。(5分)
+
+```{r}
+# Write your code here
+
+# Do not modify the code below
+A_A
+
+# Should print out:
+# A tibble: 12 x 4
+# Groups:   grade [5]
+#    grade gender     n average
+#    <dbl> <chr>  <int>   <dbl>
+#  1     1 female    10  0.476 
+#  2     1 male      10  0.476 
+#  3     1 other      1  0.0476
+#  4     2 female     8  0.4   
+#  5     2 male      12  0.6   
+#  6     3 female     1  0.143 
+#  7     3 male       6  0.857 
+#  8     4 female    13  0.481 
+#  9     4 male      13  0.481 
+# 10     4 other      1  0.0370
+# 11     5 female     5  0.5   
+# 12     5 male       5  0.5   
+```
+
+3. 請根據第一題的結果，計算出各年級的總人數，以及各年級中的GPA平均和標準差，並以GPA平均降冪排列，將結果取名為`T_T`。(5分)
+
+```{r message=FALSE}
+# Write your code here
+
+# Do not modify the code below
+T_T
+
+# Should print out:
+# A tibble: 5 x 4
+#   grade     N GPA_mean GPA_sd
+#   <dbl> <int>    <dbl>  <dbl>
+# 1     4    27     3.97  0.289
+# 2     2    20     3.81  0.469
+# 3     1    21     3.73  0.517
+# 4     5    10     3.62  0.785
+# 5     3     7     3.40  1.53 
+```
+
+
+4. 我要打包！請撰寫一個函數，此函數的 argument 為
+
+- `df`: 一個 `tibble` (必要)
+- `grades`: 年級 (預設為全部年級)
+- `values`: 數值 (預設為全部數值)  
+其結果會根據條件回傳所選擇年級的 q_self 平均、q_teacher 平均、以及 GPA 平均等數值。(5分)
+
+```{r message=FALSE}
+compute_mean <- function(df, grades, values) {
+  # Write your code here
+}
+
+# Do not modify the code below
+compute_mean(O_O)
+cat('\n\n')
+compute_mean(O_O, c(1, 3, 5), 'GPA')
+
+# Should print out:
+# A tibble: 5 x 4
+#   grade q_self_mean q_teacher_mean GPA_mean
+#   <dbl>       <dbl>          <dbl>    <dbl>
+# 1     1        77.5           91.1     3.73
+# 2     2        72.8           87.2     3.81
+# 3     3        78.6           95.1     3.40
+# 4     4        76.3           89.9     3.97
+# 5     5        67.8           80.8     3.62
+#
+#
+# A tibble: 3 x 2
+#   grade GPA_mean
+#   <dbl>    <dbl>
+# 1     1     3.73
+# 2     3     3.40
+# 3     5     3.62
+```
