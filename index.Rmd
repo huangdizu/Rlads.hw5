@@ -248,8 +248,8 @@ T_T
 
 
 ```{r message=FALSE}
+# Modify the code below
 compute_mean <- function(df, grades, columns) {
-  # Write your code here
 }
 
 # Do not modify the code below
