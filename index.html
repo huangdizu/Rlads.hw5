@@ -496,7 +496,7 @@ div.tocify {
 <span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#  9 shawn     female     1     80       100  3.8 </span></span>
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 10 KaiSquare male       3     90        90  3.5 </span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
-<li>請根據第一題的結果，計算出各年級中，不同性別的人數，以及人數在各年級中所佔比例，並將結果取名為<code>A_A</code>。(5分)</li>
+<li>請根據第一題的結果，計算出各年級中不同性別的人數 (<code>n</code>)，以及這些人數在各年級中所佔比例 (<code>average</code>)，並將結果儲存在 <code>A_A</code>。(5分)</li>
 </ol>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write your code here</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -521,7 +521,7 @@ div.tocify {
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 11     5 female     5  0.5   </span></span>
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 12     5 male       5  0.5   </span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
-<li>請根據第一題的結果，計算出各年級的總人數，以及各年級中的GPA平均和標準差，並以GPA平均降冪排列，將結果取名為<code>T_T</code>。(5分)</li>
+<li>請根據第一題的結果，計算出各年級的總人數 (<code>N</code>)，以及各年級的 GPA 平均 (<code>GPA_mean</code>) 和標準差 (<code>GPA_sd</code>)，並以 GPA 平均降冪排列，將結果儲存在 <code>T_T</code>。(5分)</li>
 </ol>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write your code here</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -538,15 +538,14 @@ div.tocify {
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 4     5    10     3.62  0.785</span></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 5     3     7     3.40  1.53 </span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
-<li>我要打包！請撰寫一個函數，此函數的 argument 為</li>
+<li>(5分) 我要打包！請撰寫一個函數 <code>compute_mean()</code>，用來計算第一題中 <code>O_O</code> 的各年級的 <code>q_self</code> 平均、<code>q_teacher</code> 平均、以及 <code>GPA</code> 平均等數值。<code>compute_mean()</code> 的 argument 為</li>
 </ol>
 <ul>
-<li><code>df</code>: 一個 <code>tibble</code> (必要)</li>
+<li><code>df</code>: 結構與 <code>O_O</code> 一樣的 <code>tibble</code> (必要)</li>
 <li><code>grades</code>: 年級 (預設為全部年級)</li>
-<li><code>values</code>: 數值 (預設為全部數值)<br />
-其結果會根據條件回傳所選擇年級的 q_self 平均、q_teacher 平均、以及 GPA 平均等數值。(5分)</li>
+<li><code>columns</code>: 要計算平均的變項名稱 (預設為 <code>q_self</code>, <code>q_teacher</code> 以及 <code>GPA</code>)</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>compute_mean <span class="ot">&lt;-</span> <span class="cf">function</span>(df, grades, values) {</span>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>compute_mean <span class="ot">&lt;-</span> <span class="cf">function</span>(df, grades, columns) {</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Write your code here</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
